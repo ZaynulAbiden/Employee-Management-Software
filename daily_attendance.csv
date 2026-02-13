@@ -1,0 +1,14 @@
+Date,Employee ID,Name,Status
+2026-02-03,104,Dawood,Absent
+2026-02-01,104,Dawood,Late
+2026-02-01,105,Hassan Ali,Late
+2026-02-12,104,Dawood,Absent
+2026-02-12,105,Hassan Ali,Late
+2026-02-10,104,Dawood,Absent
+2026-02-10,105,Hassan Ali,Absent
+2026-02-02,104,Dawood,Absent
+2026-02-02,105,Hassan Ali,Absent
+2026-02-13,104,Dawood,Absent
+2026-02-13,105,Hassan Ali,Absent
+2026-02-11,104,Dawood,Extra Late
+2026-02-11,105,Hassan Ali,Extra Late
