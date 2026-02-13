@@ -1,3 +1,8 @@
-ID,Name,Role,Base Salary,Contact,Status,Currency,Joining Date
-104,Dawood,Unity Developer,30000.12,3204825238.0,Deactive,PKR,2026-02-18
-105,Hassan Ali,Unity Developer,145000.0,,Active,PKR,2026-02-13
+ID,Name,Role,Base Salary,Status,Currency,Joining Date,Employee Type
+105,Dawood,Unity Developer,30000,Active,PKR,2/14/2026,Full Time
+124,Hassan Ali,Unity Developer,145000,Active,PKR,2/13/2026,Full Time
+120,Muhammad Talha,Production Manager,150000,Active,PKR,2/14/2026,Full Time
+108,Muhammad Usama,QA Engineer,30000,Active,PKR,10/1/2024,Full Time
+125,Muzammil Bela,Unity Developer,110000,Active,PKR,2/9/2026,Full Time
+123,Usama Sharif,Designer,0,Active,PKR,2026-02-14,Full Time
+126,Fahad Akhtar,HR Manager,30000,Active,PKR,2026-02-14,Full Time
