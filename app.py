@@ -308,10 +308,12 @@ def generate_pdf(data, role, jd, rules):
         pdf.line(15, 30, 195, 30)
         pdf.ln(5)
         
+        # Employee Information Bordered Table
         pdf.set_font("helvetica", "B", 10); pdf.set_fill_color(240, 240, 240)
         pdf.cell(0, 8, " EMPLOYEE INFORMATION", border=1, ln=True, fill=True)
         
         pdf.set_font("helvetica", "B", 9); pdf.set_fill_color(255, 255, 255)
+        # Row 1
         pdf.cell(40, 8, " Employee ID:", border="LTB")
         pdf.set_font("helvetica", "", 9)
         pdf.cell(50, 8, f"#{int(float(data['Employee ID']))}", border="TB")
@@ -320,6 +322,7 @@ def generate_pdf(data, role, jd, rules):
         pdf.set_font("helvetica", "", 9)
         pdf.cell(50, 8, str(data['Name']), border="TRB", ln=True)
         
+        # Row 2
         pdf.set_font("helvetica", "B", 9)
         pdf.cell(40, 8, " Joining Date:", border="LTB")
         pdf.set_font("helvetica", "", 9)
@@ -329,6 +332,7 @@ def generate_pdf(data, role, jd, rules):
         pdf.set_font("helvetica", "", 9)
         pdf.cell(50, 8, str(role), border="TRB", ln=True)
         
+        # Row 3
         pdf.set_font("helvetica", "B", 9)
         pdf.cell(40, 8, " Monthly Base:", border="LTB")
         pdf.set_font("helvetica", "", 9)
