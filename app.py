@@ -40,45 +40,50 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
 
-    /* Green Add Button Styling */
-    div[data-testid="stColumn"] button {
-        height: 100% !important;
-    }
-    
-    /* Target the Add Role button specifically */
+    /* Styled Green Add Button */
     div[data-testid="stColumn"] button:contains("Add Role") {
         background-color: #22c55e !important;
         color: white !important;
         border: none !important;
         font-weight: 700 !important;
+        width: 100%;
+        padding: 0.6rem !important;
     }
     
-    /* Tab Header Enhancement - Larger and Bolder */
+    /* Tab Header Enhancement - Larger, Bolder, Professional */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 20px;
+        gap: 24px;
+        border-bottom: 2px solid #e2e8f0;
     }
     .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        font-size: 1.25rem !important;
+        font-size: 1.3rem !important;
         font-weight: 800 !important;
         color: #1e293b;
+        letter-spacing: -0.02em;
+    }
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        border-bottom-color: #0f172a !important;
     }
 
     .config-header {
         color: #0f172a;
         font-weight: 800;
-        font-size: 1.4rem;
-        margin-top: 10px;
-        margin-bottom: 5px;
+        font-size: 1.5rem;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .config-desc {
         color: #475569;
-        font-size: 1rem;
+        font-size: 1.05rem;
         margin-bottom: 25px;
         line-height: 1.6;
-        background: #f1f5f9;
-        padding: 15px;
-        border-radius: 6px;
-        border-left: 4px solid #94a3b8;
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 5px solid #0f172a;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -273,7 +278,7 @@ def show_employee_management(df):
                 save_data(pd.concat([df, new_row], ignore_index=True), EMPLOYEE_FILE); st.rerun()
 
 # ==========================================
-# 6. PDF GENERATION (OPTIMIZED & STYLED)
+# 6. PDF GENERATION (PROFESSIONAL ONE PAGE)
 # ==========================================
 def generate_pdf(data, role, jd, rules):
     try:
@@ -289,7 +294,6 @@ def generate_pdf(data, role, jd, rules):
         pdf.line(15, 30, 195, 30)
         pdf.ln(5)
         
-        # Employee Information Bordered Table
         pdf.set_font("helvetica", "B", 10); pdf.set_fill_color(240, 240, 240)
         pdf.cell(0, 8, " EMPLOYEE INFORMATION", border=1, ln=True, fill=True)
         
@@ -325,13 +329,12 @@ def generate_pdf(data, role, jd, rules):
         
         pdf.ln(10)
         
-        # Earnings Components
         pdf.set_font("helvetica", "B", 10); pdf.set_fill_color(240, 240, 240)
         pdf.cell(130, 8, " EARNINGS COMPONENTS", border=1, fill=True)
         pdf.cell(50, 8, f" AMOUNT ({str(data['Currency'])})", border=1, fill=True, align="R"); pdf.ln()
         
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(130, 8, " Monthly Standard Salary", border="LRB")
+        pdf.cell(130, 8, " Monthly Base Salary", border="LRB")
         pdf.cell(50, 8, f"{float(data['Base Salary']):,.2f}", border="RB", align="R"); pdf.ln()
         
         ctx = str(data['Bonus Context']) if pd.notna(data['Bonus Context']) and str(data['Bonus Context']).lower() != "nan" else "Regular"
@@ -340,7 +343,6 @@ def generate_pdf(data, role, jd, rules):
         
         pdf.ln(6)
         
-        # Deductions (Two-line layout)
         pdf.set_font("helvetica", "B", 10); pdf.set_fill_color(240, 240, 240)
         pdf.cell(130, 8, " ATTENDANCE DEDUCTIONS", border=1, fill=True)
         pdf.cell(50, 8, " AMOUNT", border=1, fill=True, align="R"); pdf.ln()
@@ -486,49 +488,48 @@ def show_payroll_management(emp_df):
 # ==========================================
 def show_config():
     st.header("⚙️ Enterprise Configuration")
-    t1, t2 = st.tabs(["📋 Designation Management", "⚖️ Deduction Policy"])
+    
+    # Icons and Bigger Headers
+    t1, t2 = st.tabs(["📋 Designation Registry", "⚖️ Deduction Policy"])
     
     with t1:
-        st.markdown('<p class="config-header">Job Title Registry</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Define and manage the official professional roles and job titles within the Software District organization. These titles are made available as options when onboarding new staff members into the directory.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-header">Official Title Registry</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-desc">Define and manage the professional roles available within the Software District. These designations will appear as selection options during employee onboarding.</p>', unsafe_allow_html=True)
         
         roles_df = load_data(CONFIG_FILE)
         
-        # Add Role Input and Styled Button
-        c1, c2 = st.columns([3, 1])
-        new_r = c1.text_input("New Designation Title", placeholder="e.g. Senior Game Developer", label_visibility="collapsed")
-        if c2.button("Add Role", use_container_width=True):
+        # Perfect Aligned Add Role Section
+        c1, c2 = st.columns([4, 1])
+        new_r = c1.text_input("New Role Title", placeholder="Enter job title...", label_visibility="collapsed")
+        if c2.button("Add Role"):
             if new_r:
                 save_data(pd.concat([roles_df, pd.DataFrame({"Roles": [new_r]})], ignore_index=True), CONFIG_FILE)
                 st.rerun()
         
         st.markdown("<br>", unsafe_allow_html=True)
         upd_roles = st.data_editor(roles_df, use_container_width=True, num_rows="dynamic", key="role_ed")
-        if st.button("Save Official Registry"):
+        if st.button("Save Registry"):
             save_data(upd_roles, CONFIG_FILE)
             st.rerun()
 
     with t2:
-        st.markdown('<p class="config-header">Attendance Deduction Rules</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Configure the financial impact of attendance exceptions. Penalties are set as a percentage (%) of the individual employee\'s standard daily wage (calculated as <i>Total Monthly Base Salary / 30 Days</i>).</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-header">Deduction Rate Policy</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-desc">Configure the percentage-based impact of attendance exceptions. Penalties are calculated against the employee\'s standard daily wage (Monthly Base / 30).</p>', unsafe_allow_html=True)
         
         att_df = load_data(ATTENDANCE_CONFIG_FILE)
         upd = st.data_editor(
             att_df, 
             use_container_width=True,
             column_config={
-                "Parameter": st.column_config.TextColumn("Attendance Category", disabled=True),
+                "Parameter": st.column_config.TextColumn("Exception Category", disabled=True),
                 "Value": st.column_config.NumberColumn("% of Deduction", format="%d%%", min_value=0, max_value=100)
             },
             key="policy_ed"
         )
-        if st.button("Apply Global Policy Updates"):
+        if st.button("Apply Updates"):
             save_data(upd, ATTENDANCE_CONFIG_FILE)
             st.rerun()
 
-# ==========================================
-# 3. AUTHENTICATION & ROUTING
-# ==========================================
 def main():
     init_storage()
     if "authenticated" not in st.session_state: st.session_state.authenticated = False
