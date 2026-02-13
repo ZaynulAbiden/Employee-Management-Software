@@ -8,8 +8,6 @@ Date,Employee ID,Name,Status
 2026-02-10,105,Hassan Ali,Absent
 2026-02-02,104,Dawood,Absent
 2026-02-02,105,Hassan Ali,Absent
-2026-02-13,104,Dawood,Absent
-2026-02-13,105,Hassan Ali,Absent
 2026-02-11,104,Dawood,Extra Late
 2026-02-11,105,Hassan Ali,Extra Late
 2026-02-14,105,Dawood,Absent
@@ -19,3 +17,10 @@ Date,Employee ID,Name,Status
 2026-02-14,108,Muhammad Usama,Absent
 2026-02-14,125,Muzammil Bela,Absent
 2026-02-14,123,Usama Sharif,Absent
+2026-02-13,105,Dawood,Present
+2026-02-13,126,Fahad Akhtar,Absent
+2026-02-13,124,Hassan Ali,Absent
+2026-02-13,120,Muhammad Talha,Absent
+2026-02-13,108,Muhammad Usama,Absent
+2026-02-13,125,Muzammil Bela,Absent
+2026-02-13,123,Usama Sharif,Absent
