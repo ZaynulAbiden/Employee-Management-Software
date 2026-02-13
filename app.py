@@ -16,100 +16,202 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Premium CSS for Release-Ready Aesthetics
+# Dark Theme & Neon UI CSS
 st.markdown("""
     <style>
-    .main { background-color: #fcfcfc; }
+    /* Main Background - Deep Slate */
+    .stApp {
+        background-color: #0f172a; 
+    }
+
+    /* Maximize Width for Wide Layout */
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 2rem !important;
+        padding-bottom: 1rem !important;
+        max-width: 100% !important;
+    }
     
-    /* Global Card Style */
-    div.stVerticalBlock > div[data-testid="stVerticalBlockBorderWrapper"] {
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 12px !important;
-        background-color: white !important;
-        padding: 25px !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Global Typography - Bright & Readable */
+    h1 {
+        color: #38bdf8 !important; /* Sky Blue */
+        font-family: 'Inter', sans-serif;
+        font-weight: 800 !important;
+        font-size: 2.5rem !important;
+        text-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        margin-bottom: 1rem !important;
     }
-
-    /* Enterprise Panels */
-    .enterprise-panel {
-        background-color: #ffffff !important;
-        border-left: 6px solid #0f172a;
-        padding: 25px;
-        border-radius: 8px;
+    h2 {
+        color: #f8fafc !important; /* White/Slate 50 */
+        font-family: 'Inter', sans-serif;
+        font-weight: 700 !important;
+        font-size: 1.8rem !important;
+        border-bottom: 2px solid #334155;
+        padding-bottom: 10px;
+        margin-top: 1.5rem !important;
+    }
+    h3 {
+        color: #94a3b8 !important; /* Slate 400 */
+        font-size: 1.3rem !important;
+    }
+    p, label, span, div {
+        color: #cbd5e1; /* Slate 300 */
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* Section Description Panels */
+    .section-desc {
+        background-color: #1e293b;
+        border-left: 5px solid #38bdf8;
+        color: #94a3b8;
+        padding: 15px;
+        border-radius: 0 8px 8px 0;
         margin-bottom: 20px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        font-size: 0.95rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    .section-desc strong {
+        color: #38bdf8;
     }
 
-    /* Release Ready Buttons */
+    /* Cards/Containers */
+    div.stVerticalBlock > div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #1e293b !important; /* Slate 800 */
+        border: 1px solid #334155 !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Input Fields */
+    .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"] > div, .stDateInput input {
+        background-color: #334155 !important; /* Slate 700 */
+        color: #f8fafc !important; /* White Text */
+        border: 1px solid #475569 !important;
+        border-radius: 6px !important;
+        min-height: 45px; /* Larger inputs */
+    }
+    .stTextInput input:focus, .stNumberInput input:focus {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 1px #38bdf8 !important;
+    }
+    
+    /* Strict Dropdown Styling */
+    div[data-baseweb="select"] input {
+        cursor: pointer !important;
+        caret-color: transparent !important;
+    }
+    div[data-baseweb="select"] div {
+        cursor: pointer !important;
+    }
+
+    div[data-baseweb="popover"] {
+        background-color: #1e293b !important;
+    }
+    div[data-baseweb="select"] ul {
+        background-color: #1e293b !important;
+        color: white !important;
+    }
+
+    /* Tabs - EXPANDED WIDTH */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #1e293b;
+        padding: 10px 10px 0 10px;
+        border-radius: 10px 10px 0 0;
+        gap: 10px;
+        border-bottom: 2px solid #334155;
+        display: flex;
+        width: 100%;
+    }
+    .stTabs [data-baseweb="tab-list"] button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        flex-grow: 1; /* Tabs take full width */
+        text-align: center;
+    }
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+        background-color: #38bdf8 !important;
+        border-radius: 6px 6px 0 0;
+    }
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] p {
+        color: #0f172a !important; /* Dark text on bright tab */
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
+    }
+
+    /* BUTTON STYLING - LARGER & BOLDER */
     .stButton > button {
         border-radius: 8px !important;
         font-weight: 700 !important;
-        transition: all 0.2s;
-    }
-    
-    /* Green Primary Buttons */
-    div[data-testid="stColumn"] button:contains("Add Info"),
-    div[data-testid="stColumn"] button:contains("Add Role"),
-    div[data-testid="stColumn"] button:contains("Save Changes") {
-        background-color: #22c55e !important;
         color: white !important;
         border: none !important;
-        height: 3rem !important;
+        transition: transform 0.1s;
+        height: 50px !important; /* Taller buttons */
+        font-size: 16px !important;
     }
-
-    /* Red Secondary Buttons */
-    div[data-testid="stColumn"] button:contains("Reset"),
-    div[data-testid="stColumn"] button:contains("Cancel") {
-        background-color: #ef4444 !important;
+    .stButton > button:active {
+        transform: scale(0.98);
+    }
+    
+    /* Green Actions (Add, Save, Login, Confirm) */
+    div[data-testid="stColumn"] button p:contains("Add"),
+    div[data-testid="stColumn"] button p:contains("Save"),
+    div[data-testid="stColumn"] button p:contains("Confirm"),
+    div[data-testid="stColumn"] button p:contains("Login") {
         color: white !important;
-        border: none !important;
-        height: 3rem !important;
     }
-    
-    /* Edit Button Styling in Table */
-    button[key^="btn_edit_"] {
-        background-color: #f1f5f9 !important;
-        color: #0f172a !important;
-        border: 1px solid #e2e8f0 !important;
-        font-size: 0.8rem !important;
+    div[data-testid="stColumn"] button:has(p:contains("Add")),
+    div[data-testid="stColumn"] button:has(p:contains("Save")),
+    div[data-testid="stColumn"] button:has(p:contains("Confirm")),
+    div[data-testid="stColumn"] button:has(p:contains("Login")) {
+        background-color: #10b981 !important; /* Emerald 500 */
+        box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
     }
 
-    /* Tab Header Enhancement */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 30px;
-        border-bottom: 2px solid #f1f5f9;
+    /* Red Actions (Reset, Cancel, Sign Out, Delete) */
+    div[data-testid="stColumn"] button p:contains("Reset"),
+    div[data-testid="stColumn"] button p:contains("Cancel"),
+    div[data-testid="stColumn"] button p:contains("Sign Out"),
+    div[data-testid="stColumn"] button p:contains("Delete") {
+        color: white !important;
     }
-    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        font-size: 1.25rem !important;
-        font-weight: 800 !important;
-        color: #334155;
-    }
-    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] p {
-        color: #0f172a !important;
-    }
-
-    .config-header {
-        color: #0f172a;
-        font-weight: 800;
-        font-size: 1.6rem;
-        margin-bottom: 10px;
-    }
-    .config-desc {
-        color: #64748b;
-        font-size: 1.05rem;
-        margin-bottom: 25px;
-        line-height: 1.5;
+    div[data-testid="stColumn"] button:has(p:contains("Reset")),
+    div[data-testid="stColumn"] button:has(p:contains("Cancel")),
+    div[data-testid="stColumn"] button:has(p:contains("Sign Out")),
+    div[data-testid="stColumn"] button:has(p:contains("Delete")) {
+        background-color: #ef4444 !important; /* Red 500 */
+        box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
     }
     
+    /* Blue Actions (View, Edit, Sync) */
+    div[data-testid="stColumn"] button:has(p:contains("View")),
+    div[data-testid="stColumn"] button:has(p:contains("Edit")),
+    div[data-testid="stColumn"] button:has(p:contains("Sync")) {
+        background-color: #3b82f6 !important; /* Blue 500 */
+        height: auto !important; /* Keep table buttons smaller */
+        padding: 5px 15px !important;
+        min-height: 0px !important;
+    }
+
     /* Table Header Styling */
     .table-header {
-        background-color: #f8fafc;
-        padding: 10px;
+        background-color: #334155;
+        padding: 15px;
         border-radius: 8px;
         font-weight: 800;
-        color: #0f172a;
-        border: 1px solid #e2e8f0;
+        color: #38bdf8;
+        border: 1px solid #475569;
         margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Custom Dataframe */
+    [data-testid="stDataFrame"] {
+        border: 1px solid #334155;
+        border-radius: 8px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -217,7 +319,7 @@ def render_login_page():
         with st.container(border=True):
             user_i = st.text_input("Username").lower()
             pass_i = st.text_input("Password", type="password")
-            if st.button("Login", use_container_width=True, type="primary"):
+            if st.button("🔓 Login", use_container_width=True):
                 if user_i in USERS and USERS[user_i] == pass_i:
                     st.session_state.authenticated = True
                     st.session_state.current_user = user_i
@@ -226,29 +328,38 @@ def render_login_page():
                 else: st.error("Invalid credentials")
 
 def show_dashboard(emp_df):
-    st.title("🏢 Software District - HRMS Dashboard")
+    st.title("🚀 HRMS - Dashboard")
+    st.markdown("""
+        <div class="section-desc">
+            <strong>System Overview</strong><br>
+            Real-time metrics of the workforce and operational status.
+        </div>
+    """, unsafe_allow_html=True)
+
     t_count = len(emp_df) if not emp_df.empty else 0
     a_count = len(emp_df[emp_df['Status'] == 'Active']) if not emp_df.empty else 0
     d_count = len(emp_df[emp_df['Status'] == 'Deactive']) if not emp_df.empty else 0
     st.markdown(f"""
-        <div class="enterprise-panel">
-            <h3>Enterprise Overview</h3>
-            <p>The Software District workforce management system is online. Personnel data synchronized.</p>
-            <ul>
-                <li><b>Total Workforce:</b> {t_count} Records</li>
-                <li><b>Active Personnel:</b> {a_count} Employees</li>
-                <li><b>Inactive Records:</b> {d_count} Files</li>
+        <div style="background-color: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
+            <h3 style="color: #38bdf8 !important;">📈 Workforce Statistics</h3>
+            <ul style="color: #cbd5e1; list-style-type: none; padding: 0;">
+                <li style="margin-bottom: 10px;">👥 <b>Total Workforce:</b> {t_count} Records</li>
+                <li style="margin-bottom: 10px;">✅ <b>Active Personnel:</b> {a_count} Employees</li>
+                <li style="margin-bottom: 10px;">💤 <b>Inactive Records:</b> {d_count} Files</li>
             </ul>
         </div>
     """, unsafe_allow_html=True)
-    st.divider()
-    st.subheader("Recent System Logs")
-    logs = load_data(LOG_FILE)
-    if not logs.empty: st.dataframe(logs.tail(10), use_container_width=True)
 
 def show_daily_attendance(df):
-    st.header("📅 Attendance Exception Portal")
-    log_date = st.date_input("Log Date", datetime.now())
+    st.header("📅 Attendance Portal")
+    st.markdown("""
+        <div class="section-desc">
+            <strong>Exception Management</strong><br>
+            Log daily attendance exceptions such as Lates, Absents, or Half Days. Default status is 'Present'.
+        </div>
+    """, unsafe_allow_html=True)
+
+    log_date = st.date_input("Select Date", datetime.now())
     date_str = log_date.strftime("%Y-%m-%d")
     active_emps = df[df['Status'] == 'Active'].copy()
     if active_emps.empty: st.warning("No active employees found."); return
@@ -270,7 +381,7 @@ def show_daily_attendance(df):
             updated_attendance.append({"Date": date_str, "Employee ID": int(row['ID']), "Name": row['Name'], "Status": status})
             st.divider()
 
-        if st.button("Save Daily Log", type="primary", use_container_width=True):
+        if st.button("💾 Save Daily Log", use_container_width=True):
             if not attendance_df.empty: 
                 attendance_df['Employee ID'] = pd.to_numeric(attendance_df['Employee ID'], errors='coerce')
                 attendance_df = attendance_df[attendance_df['Date'] != date_str]
@@ -280,7 +391,13 @@ def show_daily_attendance(df):
             write_log(st.session_state.current_user, "Attendance", f"Updated {date_str}")
 
 def show_employee_management(df):
-    st.header("👥 Employee Directory")
+    st.header("👥 Employee Records")
+    st.markdown("""
+        <div class="section-desc">
+            <strong>Personnel Management</strong><br>
+            View active staff, update details, or onboard new employees into the system.
+        </div>
+    """, unsafe_allow_html=True)
     roles_df = load_data(CONFIG_FILE)
     roles_list = roles_df["Roles"].tolist() if not roles_df.empty else ["Unity Developer"]
     
@@ -289,11 +406,9 @@ def show_employee_management(df):
     if "edit_target_id" not in st.session_state: st.session_state.edit_target_id = None
     
     with tab1:
-        st.markdown('<p class="config-header">Active Personnel Directory</p>', unsafe_allow_html=True)
-        
         # Search and Filter Logic
         c_search, c_filter = st.columns([2, 1])
-        query = c_search.text_input("Quick Search (Name or ID)...", placeholder="Search here...")
+        query = c_search.text_input("🔍 Quick Search (Name or ID)...", placeholder="Type to search...")
         status_filter = c_filter.multiselect("Filter Status", ["Active", "Deactive"], default=["Active"])
         
         display_df = df[df['Status'].isin(status_filter)]
@@ -308,7 +423,7 @@ def show_employee_management(df):
                     <span style="flex: 3;">Full Name</span>
                     <span style="flex: 2;">Designation</span>
                     <span style="flex: 2;">Salary</span>
-                    <span style="flex: 1; text-align: right;">Manage</span>
+                    <span style="flex: 1; text-align: right;">Action</span>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -320,7 +435,7 @@ def show_employee_management(df):
                 r_c2.write(f"**{row['Name']}**")
                 r_c3.write(f"{row['Role']}")
                 r_c4.write(f"{row['Currency']} {row['Base Salary']:,.0f}")
-                if r_c5.button("Edit", key=f"btn_edit_{row['ID']}", use_container_width=True):
+                if r_c5.button("✏️ Edit", key=f"btn_edit_{row['ID']}", use_container_width=True):
                     st.session_state.edit_target_id = int(row['ID'])
                     st.rerun()
                 st.divider()
@@ -328,7 +443,7 @@ def show_employee_management(df):
         # Edit Portal Section
         if st.session_state.edit_target_id:
             st.markdown("---")
-            st.subheader(f"🛠️ Update Information: ID #{st.session_state.edit_target_id}")
+            st.subheader(f"🛠️ Updating: ID #{st.session_state.edit_target_id}")
             emp_subset = df[pd.to_numeric(df['ID'], errors='coerce') == st.session_state.edit_target_id]
             if not emp_subset.empty:
                 ed = emp_subset.iloc[0]
@@ -342,22 +457,36 @@ def show_employee_management(df):
                     up_curr = e_c4.selectbox("Currency", ["PKR", "USD"], index=0 if ed['Currency'] == "PKR" else 1)
                     up_stat = e_c5.selectbox("Status", ["Active", "Deactive"], index=0 if ed['Status'] == "Active" else 1)
                     
-                    btn_up, btn_can, btn_spacer = st.columns([1, 1, 3])
-                    if btn_up.button("Save Changes"):
-                        df.loc[pd.to_numeric(df['ID'], errors='coerce') == st.session_state.edit_target_id, 
-                               ['Name', 'Role', 'Base Salary', 'Currency', 'Status']] = [up_name, up_role, up_sal, up_curr, up_stat]
-                        save_data(df, EMPLOYEE_FILE)
-                        st.session_state.edit_target_id = None
-                        st.success("Record updated successfully.")
-                        st.rerun()
-                    if btn_can.button("Cancel"):
-                        st.session_state.edit_target_id = None
-                        st.rerun()
+                    # Enhanced Button Layout
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    btn_save, btn_cancel, btn_del = st.columns(3)
+                    
+                    with btn_save:
+                        if st.button("💾 Save Changes", use_container_width=True):
+                            df.loc[pd.to_numeric(df['ID'], errors='coerce') == st.session_state.edit_target_id, 
+                                   ['Name', 'Role', 'Base Salary', 'Currency', 'Status']] = [up_name, up_role, up_sal, up_curr, up_stat]
+                            save_data(df, EMPLOYEE_FILE)
+                            st.session_state.edit_target_id = None
+                            st.success("Record updated successfully.")
+                            st.rerun()
+                            
+                    with btn_cancel:
+                        if st.button("❌ Cancel", use_container_width=True):
+                            st.session_state.edit_target_id = None
+                            st.rerun()
+                            
+                    with btn_del:
+                        if st.button("🗑️ Delete Employee", use_container_width=True):
+                            df = df[pd.to_numeric(df['ID'], errors='coerce') != st.session_state.edit_target_id]
+                            save_data(df, EMPLOYEE_FILE)
+                            st.session_state.edit_target_id = None
+                            st.warning("Employee record deleted.")
+                            write_log(st.session_state.current_user, "Deletion", f"Deleted Employee ID {st.session_state.edit_target_id}")
+                            st.rerun()
 
     with tab2:
         with st.container(border=True):
-            st.markdown('<p class="config-header">New Personnel Onboarding</p>', unsafe_allow_html=True)
-            st.markdown('<p class="config-desc">Enter the details below to register a new employee. Ensure designations are updated in the Configuration tab.</p>', unsafe_allow_html=True)
+            st.subheader("New Personnel Onboarding")
             
             f_col1, f_col2 = st.columns(2)
             with f_col1:
@@ -371,7 +500,7 @@ def show_employee_management(df):
             st.markdown("<br>", unsafe_allow_html=True)
             btn_c1, btn_c2, btn_sp = st.columns([1.2, 1, 3])
             
-            if btn_c1.button("Add Info", use_container_width=True):
+            if btn_c1.button("➕ Add Info", use_container_width=True):
                 if not new_name:
                     st.error("Missing Info: Full Name is required.")
                 elif new_name in df['Name'].values:
@@ -388,7 +517,7 @@ def show_employee_management(df):
                     write_log(st.session_state.current_user, "Onboarding", f"Onboarded {new_name}")
                     st.rerun()
 
-            if btn_c2.button("Reset", use_container_width=True):
+            if btn_c2.button("🔄 Reset", use_container_width=True):
                 st.rerun()
 
 # ==========================================
@@ -498,7 +627,13 @@ def open_pdf_js(pdf_bytes):
     components.html(js, height=0)
 
 def show_payroll_management(emp_df):
-    st.header("💳 Monthly Payroll Processing")
+    st.header("💳 Monthly Payroll")
+    st.markdown("""
+        <div class="section-desc">
+            <strong>Salary Processing Center</strong><br>
+            Calculate and finalize salaries. Syncs with attendance logs to automatically calculate deductions.
+        </div>
+    """, unsafe_allow_html=True)
     c_m, c_y = st.columns(2)
     month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     now = datetime.now()
@@ -556,7 +691,7 @@ def show_payroll_management(emp_df):
             payroll_buffer.append({"Month": period, "Employee ID": row['ID'], "Name": row['Name'], "Base Salary": row['Base Salary'], "Currency": row['Currency'], "Lates": l, "Extra Lates": el, "Half Days": hd, "Absents": ab, "Deductions": deduct, "Bonus": bonus, "Bonus Context": ctx, "Net Paid": net})
             st.divider()
 
-    if st.button("🚀 Confirm and Process Monthly Payroll", type="primary", use_container_width=True):
+    if st.button("🚀 Confirm & Process Payroll", use_container_width=True):
         if not payroll_history.empty:
             payroll_history['Employee ID'] = pd.to_numeric(payroll_history['Employee ID'], errors='coerce')
             payroll_history = payroll_history[~((payroll_history['Month'] == period) & (payroll_history['Employee ID'].isin([float(p['Employee ID']) for p in payroll_buffer])))]
@@ -571,23 +706,31 @@ def show_config():
     t1, t2 = st.tabs(["📋 Designation Management", "⚖️ Deduction Policy"])
     
     with t1:
-        st.markdown('<p class="config-header">Job Title Registry</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Define professional roles. These designations appear as selection options during onboarding.</p>', unsafe_allow_html=True)
+        st.markdown("""
+            <div class="section-desc">
+                <strong>Job Titles</strong><br>
+                Define the roles available in your organization. These appear in onboarding dropdowns.
+            </div>
+        """, unsafe_allow_html=True)
         roles_df = load_data(CONFIG_FILE)
         c1, c2 = st.columns([4, 1.2])
         new_r = c1.text_input("New Designation Title", placeholder="Enter job title...", label_visibility="collapsed")
-        if c2.button("Add Role"):
+        if c2.button("✨ Add Role"):
             if new_r: save_data(pd.concat([roles_df, pd.DataFrame({"Roles": [new_r]})], ignore_index=True), CONFIG_FILE); st.rerun()
         st.markdown("<br>", unsafe_allow_html=True)
         upd_roles = st.data_editor(roles_df, use_container_width=True, num_rows="dynamic", key="role_ed")
-        if st.button("Save Official Registry"): save_data(upd_roles, CONFIG_FILE); st.rerun()
+        if st.button("💾 Save Official Registry"): save_data(upd_roles, CONFIG_FILE); st.rerun()
 
     with t2:
-        st.markdown('<p class="config-header">Attendance Deduction Rules</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Set the financial impact of exceptions. Penalties are % of daily wage.</p>', unsafe_allow_html=True)
+        st.markdown("""
+            <div class="section-desc">
+                <strong>Financial Penalties</strong><br>
+                Configure the percentage of daily wage deducted for specific attendance exceptions.
+            </div>
+        """, unsafe_allow_html=True)
         att_df = load_data(ATTENDANCE_CONFIG_FILE)
         upd = st.data_editor(att_df, use_container_width=True, column_config={"Parameter": st.column_config.TextColumn("Exception Category", disabled=True), "Value": st.column_config.NumberColumn("% of Deduction", format="%d%%")}, key="policy_ed")
-        if st.button("Apply Global Updates"): save_data(upd, ATTENDANCE_CONFIG_FILE); st.rerun()
+        if st.button("💾 Apply Global Updates"): save_data(upd, ATTENDANCE_CONFIG_FILE); st.rerun()
 
 # ==========================================
 # 7. MAIN ROUTING
@@ -599,11 +742,11 @@ def main():
     else:
         with st.sidebar:
             st.title("SD - HRMS"); st.markdown(f"**Admin:** {st.session_state.current_user}"); st.divider()
-            page = st.radio("Navigation", ["Dashboard", "Employee Directory", "Daily Attendance", "Payroll Management", "Configuration", "Audit Logs"])
-            if st.button("Sign Out Session", use_container_width=True): st.session_state.authenticated = False; st.rerun()
+            page = st.radio("Navigation", ["Dashboard", "Employee Records", "Daily Attendance", "Payroll Management", "Configuration", "Audit Logs"])
+            if st.button("🚪 Sign Out Session", use_container_width=True): st.session_state.authenticated = False; st.rerun()
         emp_df = load_data(EMPLOYEE_FILE)
         if page == "Dashboard": show_dashboard(emp_df)
-        elif page == "Employee Directory": show_employee_management(emp_df)
+        elif page == "Employee Records": show_employee_management(emp_df)
         elif page == "Daily Attendance": show_daily_attendance(emp_df)
         elif page == "Payroll Management": show_payroll_management(emp_df)
         elif page == "Configuration": show_config()
