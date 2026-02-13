@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Premium CSS for Layout and Configuration Panels
+# Premium CSS for Enterprise Look
 st.markdown("""
     <style>
     .main { background-color: #fcfcfc; }
@@ -40,40 +40,39 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
 
-    /* Styled Green Add Button */
+    /* Styled Green Add Button - Aligned and High Contrast */
     div[data-testid="stColumn"] button:contains("Add Role") {
         background-color: #22c55e !important;
         color: white !important;
         border: none !important;
         font-weight: 700 !important;
         width: 100%;
-        padding: 0.6rem !important;
+        padding: 0.55rem !important;
+        margin-top: 0px !important;
     }
     
-    /* Tab Header Enhancement - Larger, Bolder, Professional */
+    /* Tab Header Enhancement - Professional Typography */
     .stTabs [data-baseweb="tab-list"] {
         gap: 24px;
         border-bottom: 2px solid #e2e8f0;
     }
     .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        font-size: 1.3rem !important;
+        font-size: 1.35rem !important;
         font-weight: 800 !important;
-        color: #1e293b;
+        color: #0f172a;
         letter-spacing: -0.02em;
     }
     .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
         border-bottom-color: #0f172a !important;
+        background-color: #f8fafc !important;
     }
 
     .config-header {
         color: #0f172a;
         font-weight: 800;
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         margin-top: 15px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        margin-bottom: 8px;
     }
     .config-desc {
         color: #475569;
@@ -159,7 +158,7 @@ def write_log(user, action, details):
     log_entry.to_csv(LOG_FILE, mode='a', header=False, index=False)
 
 # ==========================================
-# 4. CORE CALCULATION LOGIC
+# 3. CORE LOGIC
 # ==========================================
 def get_attendance_rules():
     df = load_data(ATTENDANCE_CONFIG_FILE)
@@ -170,17 +169,34 @@ def get_attendance_rules():
 def calculate_net_salary(base, lates, extra_lates, half_days, absents, bonus):
     rules = get_attendance_rules()
     daily_wage = float(base) / 30
-    late_deduct = float(lates) * (daily_wage * (rules["Late"] / 100))
-    extra_late_deduct = float(extra_lates) * (daily_wage * (rules["Extra Late"] / 100))
-    half_day_deduct = float(half_days) * (daily_wage * (rules["Half Day"] / 100))
-    absent_deduct = float(absents) * (daily_wage * (rules["Absent"] / 100))
-    total_deductions = late_deduct + extra_late_deduct + half_day_deduct + absent_deduct
+    total_deductions = (
+        float(lates) * (daily_wage * (rules["Late"] / 100)) +
+        float(extra_lates) * (daily_wage * (rules["Extra Late"] / 100)) +
+        float(half_days) * (daily_wage * (rules["Half Day"] / 100)) +
+        float(absents) * (daily_wage * (rules["Absent"] / 100))
+    )
     net = (float(base) + float(bonus)) - total_deductions
     return round(net, 2), round(total_deductions, 2)
 
 # ==========================================
-# 5. UI PAGES
+# 4. UI COMPONENTS
 # ==========================================
+
+def render_login_page():
+    _, col_mid, _ = st.columns([1, 1.5, 1])
+    with col_mid:
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center;'><h1>The Software District</h1><p style='color: #64748b;'>HRMS Enterprise Portal</p></div>", unsafe_allow_html=True)
+        with st.container(border=True):
+            user_i = st.text_input("Username").lower()
+            pass_i = st.text_input("Password", type="password")
+            if st.button("Login", use_container_width=True, type="primary"):
+                if user_i in USERS and USERS[user_i] == pass_i:
+                    st.session_state.authenticated = True
+                    st.session_state.current_user = user_i
+                    write_log(user_i, "Login", "Successful Login")
+                    st.rerun()
+                else: st.error("Invalid credentials")
 
 def show_dashboard(emp_df):
     st.title("🏢 Software District - HRMS Dashboard")
@@ -212,8 +228,6 @@ def show_daily_attendance(df):
     
     attendance_df = load_data(DAILY_ATTENDANCE_FILE)
     existing_logs = attendance_df[attendance_df['Date'] == date_str] if not attendance_df.empty else pd.DataFrame()
-    
-    st.info("Log only employee exceptions (Late, Absent, etc.). All unmarked employees default to Present.")
     
     updated_attendance = []
     with st.container(border=True):
@@ -278,7 +292,7 @@ def show_employee_management(df):
                 save_data(pd.concat([df, new_row], ignore_index=True), EMPLOYEE_FILE); st.rerun()
 
 # ==========================================
-# 6. PDF GENERATION (PROFESSIONAL ONE PAGE)
+# 5. PDF & PAYROLL LOGIC
 # ==========================================
 def generate_pdf(data, role, jd, rules):
     try:
@@ -298,34 +312,31 @@ def generate_pdf(data, role, jd, rules):
         pdf.cell(0, 8, " EMPLOYEE INFORMATION", border=1, ln=True, fill=True)
         
         pdf.set_font("helvetica", "B", 9); pdf.set_fill_color(255, 255, 255)
-        # Row 1
-        pdf.cell(40, 8, " Employee ID:", border="LTB", fill=True)
+        pdf.cell(40, 8, " Employee ID:", border="LTB")
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(50, 8, f"#{int(float(data['Employee ID']))}", border="TB", fill=True)
+        pdf.cell(50, 8, f"#{int(float(data['Employee ID']))}", border="TB")
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(40, 8, " Full Name:", border="LTB", fill=True)
+        pdf.cell(40, 8, " Full Name:", border="LTB")
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(50, 8, str(data['Name']), border="TRB", ln=True, fill=True)
+        pdf.cell(50, 8, str(data['Name']), border="TRB", ln=True)
         
-        # Row 2
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(40, 8, " Joining Date:", border="LTB", fill=True)
+        pdf.cell(40, 8, " Joining Date:", border="LTB")
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(50, 8, str(jd), border="TB", fill=True)
+        pdf.cell(50, 8, str(jd), border="TB")
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(40, 8, " Designation:", border="LTB", fill=True)
+        pdf.cell(40, 8, " Designation:", border="LTB")
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(50, 8, str(role), border="TRB", ln=True, fill=True)
+        pdf.cell(50, 8, str(role), border="TRB", ln=True)
         
-        # Row 3
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(40, 8, " Monthly Base:", border="LTB", fill=True)
+        pdf.cell(40, 8, " Monthly Base:", border="LTB")
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(50, 8, f"{float(data['Base Salary']):,.0f}", border="TB", fill=True)
+        pdf.cell(50, 8, f"{float(data['Base Salary']):,.0f}", border="TB")
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(40, 8, " Currency Unit:", border="LTB", fill=True)
+        pdf.cell(40, 8, " Currency Unit:", border="LTB")
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(50, 8, str(data['Currency']), border="TRB", ln=True, fill=True)
+        pdf.cell(50, 8, str(data['Currency']), border="TRB", ln=True)
         
         pdf.ln(10)
         
@@ -348,12 +359,7 @@ def generate_pdf(data, role, jd, rules):
         pdf.cell(50, 8, " AMOUNT", border=1, fill=True, align="R"); pdf.ln()
         
         daily_wage = float(data['Base Salary']) / 30
-        deductions = [
-            ("Lates", float(data['Lates']), "Late"),
-            ("Extra Lates", float(data['Extra Lates']), "Extra Late"),
-            ("Half Days", float(data['Half Days']), "Half Day"),
-            ("Absents", float(data['Absents']), "Absent")
-        ]
+        deductions = [("Lates", float(data['Lates']), "Late"), ("Extra Lates", float(data['Extra Lates']), "Extra Late"), ("Half Days", float(data['Half Days']), "Half Day"), ("Absents", float(data['Absents']), "Absent")]
         
         for label, days, key in deductions:
             x_start = pdf.get_x()
@@ -379,38 +385,22 @@ def generate_pdf(data, role, jd, rules):
         
         pdf.set_y(260)
         pdf.set_font("helvetica", "I", 8); pdf.set_text_color(150, 150, 150)
-        pdf.cell(0, 4, "This document is computer-generated and serves as an official proof of payment.", ln=True, align="C")
-        pdf.cell(0, 4, "Strictly Confidential - The Software District Enterprise Management.", ln=True, align="C")
+        pdf.cell(0, 4, "Official Payment Proof - Generated Automatically.", ln=True, align="C")
+        pdf.cell(0, 4, "Strictly Confidential - The Software District HRMS.", ln=True, align="C")
         
         return bytes(pdf.output())
     except Exception as e:
         raise e
 
 def open_pdf_js(pdf_bytes):
-    """Triggers a Javascript action to open the PDF in a new tab."""
     b64 = base64.b64encode(pdf_bytes).decode()
-    js = f"""
-    <script>
-    var pdfWindow = window.open("");
-    if (pdfWindow) {{
-        pdfWindow.document.write(
-            "<html><head><title>Salary Slip</title></head><body style='margin:0; padding:0;'><iframe width='100%' height='100%' style='border:none;' src='data:application/pdf;base64,{b64}'></iframe></body></html>"
-        );
-    }} else {{
-        alert("Action Required: Please allow popups to view the salary slip.");
-    }}
-    </script>
-    """
+    js = f"""<script>var pdfWindow = window.open(""); if (pdfWindow) {{ pdfWindow.document.write("<html><head><title>Salary Slip</title></head><body style='margin:0; padding:0;'><iframe width='100%' height='100%' style='border:none;' src='data:application/pdf;base64,{b64}'></iframe></body></html>"); }} else {{ alert("Popup blocked!"); }}</script>"""
     components.html(js, height=0)
 
-# ==========================================
-# 7. PAYROLL MANAGEMENT
-# ==========================================
 def show_payroll_management(emp_df):
     st.header("💳 Monthly Payroll Processing")
     c_m, c_y = st.columns(2)
     month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    
     now = datetime.now()
     month = c_m.selectbox("Processing Month", month_names, index=now.month - 1)
     year = c_y.selectbox("Processing Year", [2024, 2025, 2026], index=[2024, 2025, 2026].index(now.year))
@@ -419,7 +409,7 @@ def show_payroll_management(emp_df):
     attendance_df = load_data(DAILY_ATTENDANCE_FILE)
     payroll_history = load_data(PAYROLL_FILE)
     active_emps = emp_df[emp_df['Status'] == 'Active'].copy()
-    if active_emps.empty: st.warning("No active employees found in directory."); return
+    if active_emps.empty: st.warning("No active employees found."); return
 
     if st.button("🔄 Sync Attendance Records", use_container_width=True):
         m_idx = month_names.index(month) + 1
@@ -427,7 +417,6 @@ def show_payroll_management(emp_df):
             attendance_df['ParsedDate'] = pd.to_datetime(attendance_df['Date'], errors='coerce')
             attendance_df['Employee ID'] = pd.to_numeric(attendance_df['Employee ID'], errors='coerce')
             month_logs = attendance_df[(attendance_df['ParsedDate'].dt.year == year) & (attendance_df['ParsedDate'].dt.month == m_idx)]
-            
             for _, row in active_emps.iterrows():
                 eid_key = int(row['ID'])
                 emp_logs = month_logs[month_logs['Employee ID'] == float(row['ID'])]
@@ -435,41 +424,33 @@ def show_payroll_management(emp_df):
                 st.session_state[f"el_{eid_key}"] = int(len(emp_logs[emp_logs['Status'] == "Extra Late"]))
                 st.session_state[f"hd_{eid_key}"] = int(len(emp_logs[emp_logs['Status'] == "Half Day"]))
                 st.session_state[f"ab_{eid_key}"] = int(len(emp_logs[emp_logs['Status'] == "Absent"]))
-            
-            st.session_state.fetch_period = period
-            st.toast(f"Synchronized attendance for {period}")
-            st.rerun()
+            st.toast(f"Attendance Synced for {period}"); st.rerun()
 
     payroll_buffer = []
     with st.container(border=True):
         for _, row in active_emps.iterrows():
             eid_key = int(row['ID'])
-            if f"l_{eid_key}" not in st.session_state: st.session_state[f"l_{eid_key}"] = 0
-            if f"el_{eid_key}" not in st.session_state: st.session_state[f"el_{eid_key}"] = 0
-            if f"hd_{eid_key}" not in st.session_state: st.session_state[f"hd_{eid_key}"] = 0
-            if f"ab_{eid_key}" not in st.session_state: st.session_state[f"ab_{eid_key}"] = 0
+            for k in ['l', 'el', 'hd', 'ab']:
+                if f"{k}_{eid_key}" not in st.session_state: st.session_state[f"{k}_{eid_key}"] = 0
 
             c_head, c_btn = st.columns([4, 1.2])
             c_head.markdown(f"#### {row['Name']} — <span style='color: #64748b;'>{row['Role']}</span>", unsafe_allow_html=True)
-            
             hist_match = payroll_history[(payroll_history['Month'] == period) & (pd.to_numeric(payroll_history['Employee ID'], errors='coerce') == float(row['ID']))]
             if not hist_match.empty:
                 if c_btn.button("📄 View Slip", key=f"view_{eid_key}", use_container_width=True):
-                    try:
-                        pdf_bytes = generate_pdf(hist_match.iloc[0], row['Role'], row['Joining Date'], get_attendance_rules())
-                        open_pdf_js(pdf_bytes)
-                    except: c_btn.error("PDF Fail")
+                    pdf_bytes = generate_pdf(hist_match.iloc[0], row['Role'], row['Joining Date'], get_attendance_rules())
+                    open_pdf_js(pdf_bytes)
             else: c_btn.info("Pending Process")
             
             p_cols = st.columns(4)
-            l = p_cols[0].number_input("Late Count", min_value=0, key=f"l_{eid_key}")
-            el = p_cols[1].number_input("Extra Late Count", min_value=0, key=f"el_{eid_key}")
-            hd = p_cols[2].number_input("Half Day Count", min_value=0, key=f"hd_{eid_key}")
-            ab = p_cols[3].number_input("Absent Count", min_value=0, key=f"ab_{eid_key}")
+            l = p_cols[0].number_input("Late", min_value=0, key=f"l_{eid_key}")
+            el = p_cols[1].number_input("Extra Late", min_value=0, key=f"el_{eid_key}")
+            hd = p_cols[2].number_input("Half Day", min_value=0, key=f"hd_{eid_key}")
+            ab = p_cols[3].number_input("Absent", min_value=0, key=f"ab_{eid_key}")
             
             b_cols = st.columns(2)
-            bonus = b_cols[0].number_input("Incentives / Bonus", min_value=0.0, key=f"bon_{eid_key}")
-            ctx = b_cols[1].text_input("Reasoning", placeholder="Performance reward...", key=f"ctx_{eid_key}")
+            bonus = b_cols[0].number_input("Incentive", min_value=0.0, key=f"bon_{eid_key}")
+            ctx = b_cols[1].text_input("Reason", placeholder="Reward context...", key=f"ctx_{eid_key}")
             
             net, deduct = calculate_net_salary(row['Base Salary'], l, el, hd, ab, bonus)
             payroll_buffer.append({"Month": period, "Employee ID": row['ID'], "Name": row['Name'], "Base Salary": row['Base Salary'], "Currency": row['Currency'], "Lates": l, "Extra Lates": el, "Half Days": hd, "Absents": ab, "Deductions": deduct, "Bonus": bonus, "Bonus Context": ctx, "Net Paid": net})
@@ -480,55 +461,33 @@ def show_payroll_management(emp_df):
             payroll_history['Employee ID'] = pd.to_numeric(payroll_history['Employee ID'], errors='coerce')
             payroll_history = payroll_history[~((payroll_history['Month'] == period) & (payroll_history['Employee ID'].isin([float(p['Employee ID']) for p in payroll_buffer])))]
         save_data(pd.concat([payroll_history, pd.DataFrame(payroll_buffer)], ignore_index=True), PAYROLL_FILE)
-        st.success(f"Payroll successfully archived for {period}.")
-        st.rerun()
+        st.success(f"Payroll archived for {period}."); st.rerun()
 
 # ==========================================
-# 8. CONFIGURATION UI
+# 6. CONFIGURATION
 # ==========================================
 def show_config():
     st.header("⚙️ Enterprise Configuration")
-    
-    # Icons and Bigger Headers
     t1, t2 = st.tabs(["📋 Designation Registry", "⚖️ Deduction Policy"])
     
     with t1:
-        st.markdown('<p class="config-header">Official Title Registry</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Define and manage the professional roles available within the Software District. These designations will appear as selection options during employee onboarding.</p>', unsafe_allow_html=True)
-        
+        st.markdown('<p class="config-header">Job Title Registry</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-desc">Define professional roles within Software District. These designations appear as selection options during onboarding.</p>', unsafe_allow_html=True)
         roles_df = load_data(CONFIG_FILE)
-        
-        # Perfect Aligned Add Role Section
-        c1, c2 = st.columns([4, 1])
-        new_r = c1.text_input("New Role Title", placeholder="Enter job title...", label_visibility="collapsed")
+        c1, c2 = st.columns([4, 1.2])
+        new_r = c1.text_input("New Designation Title", placeholder="Enter job title...", label_visibility="collapsed")
         if c2.button("Add Role"):
-            if new_r:
-                save_data(pd.concat([roles_df, pd.DataFrame({"Roles": [new_r]})], ignore_index=True), CONFIG_FILE)
-                st.rerun()
-        
+            if new_r: save_data(pd.concat([roles_df, pd.DataFrame({"Roles": [new_r]})], ignore_index=True), CONFIG_FILE); st.rerun()
         st.markdown("<br>", unsafe_allow_html=True)
         upd_roles = st.data_editor(roles_df, use_container_width=True, num_rows="dynamic", key="role_ed")
-        if st.button("Save Registry"):
-            save_data(upd_roles, CONFIG_FILE)
-            st.rerun()
+        if st.button("Save Registry"): save_data(upd_roles, CONFIG_FILE); st.rerun()
 
     with t2:
         st.markdown('<p class="config-header">Deduction Rate Policy</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Configure the percentage-based impact of attendance exceptions. Penalties are calculated against the employee\'s standard daily wage (Monthly Base / 30).</p>', unsafe_allow_html=True)
-        
+        st.markdown('<p class="config-desc">Impact of attendance exceptions. Penalties are % of daily wage (Monthly Base / 30).</p>', unsafe_allow_html=True)
         att_df = load_data(ATTENDANCE_CONFIG_FILE)
-        upd = st.data_editor(
-            att_df, 
-            use_container_width=True,
-            column_config={
-                "Parameter": st.column_config.TextColumn("Exception Category", disabled=True),
-                "Value": st.column_config.NumberColumn("% of Deduction", format="%d%%", min_value=0, max_value=100)
-            },
-            key="policy_ed"
-        )
-        if st.button("Apply Updates"):
-            save_data(upd, ATTENDANCE_CONFIG_FILE)
-            st.rerun()
+        upd = st.data_editor(att_df, use_container_width=True, column_config={"Parameter": st.column_config.TextColumn("Category", disabled=True), "Value": st.column_config.NumberColumn("% of Deduction", format="%d%%")}, key="policy_ed")
+        if st.button("Apply Updates"): save_data(upd, ATTENDANCE_CONFIG_FILE); st.rerun()
 
 def main():
     init_storage()
@@ -537,9 +496,8 @@ def main():
     else:
         with st.sidebar:
             st.title("SD - HRMS"); st.markdown(f"**Admin:** {st.session_state.current_user}"); st.divider()
-            page = st.radio("Enterprise Navigation", ["Dashboard", "Workforce Directory", "Daily Attendance", "Payroll Management", "Configuration", "System Logs"])
+            page = st.radio("Navigation", ["Dashboard", "Workforce Directory", "Daily Attendance", "Payroll Management", "Configuration", "System Logs"])
             if st.button("Sign Out Session", use_container_width=True): st.session_state.authenticated = False; st.rerun()
-        
         emp_df = load_data(EMPLOYEE_FILE)
         if page == "Dashboard": show_dashboard(emp_df)
         elif page == "Workforce Directory": show_employee_management(emp_df)
@@ -550,5 +508,4 @@ def main():
             st.title("📜 Audit Trail"); logs = load_data(LOG_FILE)
             if not logs.empty: st.dataframe(logs.iloc[::-1], use_container_width=True)
 
-if __name__ == "__main__": 
-    main()
+if __name__ == "__main__": main()
