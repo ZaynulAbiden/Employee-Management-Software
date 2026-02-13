@@ -16,73 +16,100 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Premium CSS for Enterprise Look
+# Premium CSS for Release-Ready Aesthetics
 st.markdown("""
     <style>
     .main { background-color: #fcfcfc; }
     
-    /* Dashboard & Config Cards */
+    /* Global Card Style */
     div.stVerticalBlock > div[data-testid="stVerticalBlockBorderWrapper"] {
         border: 1px solid #e2e8f0 !important;
-        border-radius: 8px !important;
+        border-radius: 12px !important;
         background-color: white !important;
         padding: 25px !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     /* Enterprise Panels */
     .enterprise-panel {
         background-color: #ffffff !important;
-        border-left: 5px solid #0f172a;
+        border-left: 6px solid #0f172a;
         padding: 25px;
-        border-radius: 4px;
+        border-radius: 8px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
     }
 
-    /* Styled Green Add Button - Aligned and High Contrast */
-    div[data-testid="stColumn"] button:contains("Add Role") {
+    /* Release Ready Buttons */
+    .stButton > button {
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+        transition: all 0.2s;
+    }
+    
+    /* Green Primary Buttons */
+    div[data-testid="stColumn"] button:contains("Add Info"),
+    div[data-testid="stColumn"] button:contains("Add Role"),
+    div[data-testid="stColumn"] button:contains("Save Changes") {
         background-color: #22c55e !important;
         color: white !important;
         border: none !important;
-        font-weight: 700 !important;
-        width: 100%;
-        padding: 0.55rem !important;
-        margin-top: 0px !important;
+        height: 3rem !important;
+    }
+
+    /* Red Secondary Buttons */
+    div[data-testid="stColumn"] button:contains("Reset"),
+    div[data-testid="stColumn"] button:contains("Cancel") {
+        background-color: #ef4444 !important;
+        color: white !important;
+        border: none !important;
+        height: 3rem !important;
     }
     
-    /* Tab Header Enhancement - Professional Typography */
+    /* Edit Button Styling in Table */
+    button[key^="btn_edit_"] {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+        border: 1px solid #e2e8f0 !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Tab Header Enhancement */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 24px;
-        border-bottom: 2px solid #e2e8f0;
+        gap: 30px;
+        border-bottom: 2px solid #f1f5f9;
     }
     .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        font-size: 1.35rem !important;
+        font-size: 1.25rem !important;
         font-weight: 800 !important;
-        color: #0f172a;
-        letter-spacing: -0.02em;
+        color: #334155;
     }
-    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        border-bottom-color: #0f172a !important;
-        background-color: #f8fafc !important;
+    .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] p {
+        color: #0f172a !important;
     }
 
     .config-header {
         color: #0f172a;
         font-weight: 800;
         font-size: 1.6rem;
-        margin-top: 15px;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
     .config-desc {
-        color: #475569;
+        color: #64748b;
         font-size: 1.05rem;
         margin-bottom: 25px;
-        line-height: 1.6;
-        background: #f8fafc;
-        padding: 20px;
+        line-height: 1.5;
+    }
+    
+    /* Table Header Styling */
+    .table-header {
+        background-color: #f8fafc;
+        padding: 10px;
         border-radius: 8px;
-        border-left: 5px solid #0f172a;
+        font-weight: 800;
+        color: #0f172a;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -171,7 +198,7 @@ def calculate_net_salary(base, lates, extra_lates, half_days, absents, bonus):
     daily_wage = float(base) / 30
     total_deductions = (
         float(lates) * (daily_wage * (rules["Late"] / 100)) +
-        float(extra_lates) * (daily_wage * (rules["Extra Late"] / 100)) +
+        float(extra_late_deduct := extra_lates) * (daily_wage * (rules["Extra Late"] / 100)) +
         float(half_days) * (daily_wage * (rules["Half Day"] / 100)) +
         float(absents) * (daily_wage * (rules["Absent"] / 100))
     )
@@ -179,7 +206,7 @@ def calculate_net_salary(base, lates, extra_lates, half_days, absents, bonus):
     return round(net, 2), round(total_deductions, 2)
 
 # ==========================================
-# 4. UI COMPONENTS
+# 4. UI PAGES
 # ==========================================
 
 def render_login_page():
@@ -253,43 +280,116 @@ def show_daily_attendance(df):
             write_log(st.session_state.current_user, "Attendance", f"Updated {date_str}")
 
 def show_employee_management(df):
-    st.header("👥 Workforce Directory")
+    st.header("👥 Employee Directory")
     roles_df = load_data(CONFIG_FILE)
     roles_list = roles_df["Roles"].tolist() if not roles_df.empty else ["Unity Developer"]
-    tab1, tab2 = st.tabs(["Directory View", "Onboard Employee"])
     
-    if "edit_id" not in st.session_state: st.session_state.edit_id = None
+    tab1, tab2 = st.tabs(["📋 Employee List", "➕ Onboard Employee"])
+    
+    if "edit_target_id" not in st.session_state: st.session_state.edit_target_id = None
     
     with tab1:
-        search = st.text_input("Search Personnel...")
-        display_df = df if not search else df[df['Name'].str.contains(search, case=False)]
-        st.dataframe(display_df, use_container_width=True)
-        sel_id = st.number_input("Input ID to Modify", min_value=0, step=1)
-        if st.button("Open File"): st.session_state.edit_id = int(sel_id); st.rerun()
+        st.markdown('<p class="config-header">Active Personnel Directory</p>', unsafe_allow_html=True)
         
-        if st.session_state.edit_id:
-            emp = df[pd.to_numeric(df['ID'], errors='coerce') == st.session_state.edit_id]
-            if not emp.empty:
+        # Search and Filter Logic
+        c_search, c_filter = st.columns([2, 1])
+        query = c_search.text_input("Quick Search (Name or ID)...", placeholder="Search here...")
+        status_filter = c_filter.multiselect("Filter Status", ["Active", "Deactive"], default=["Active"])
+        
+        display_df = df[df['Status'].isin(status_filter)]
+        if query:
+            display_df = display_df[display_df['Name'].str.contains(query, case=False) | display_df['ID'].astype(str).str.contains(query)]
+        
+        # Custom Table Design
+        st.markdown("""
+            <div class="table-header">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="flex: 1;">ID</span>
+                    <span style="flex: 3;">Full Name</span>
+                    <span style="flex: 2;">Designation</span>
+                    <span style="flex: 2;">Salary</span>
+                    <span style="flex: 1; text-align: right;">Manage</span>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        for _, row in display_df.iterrows():
+            with st.container():
+                r_c1, r_c2, r_c3, r_c4, r_c5 = st.columns([1, 3, 2, 2, 1])
+                r_c1.write(f"#{int(row['ID'])}")
+                r_c2.write(f"**{row['Name']}**")
+                r_c3.write(f"{row['Role']}")
+                r_c4.write(f"{row['Currency']} {row['Base Salary']:,.0f}")
+                if r_c5.button("Edit", key=f"btn_edit_{row['ID']}", use_container_width=True):
+                    st.session_state.edit_target_id = int(row['ID'])
+                    st.rerun()
+                st.divider()
+
+        # Edit Portal Section
+        if st.session_state.edit_target_id:
+            st.markdown("---")
+            st.subheader(f"🛠️ Update Information: ID #{st.session_state.edit_target_id}")
+            emp_subset = df[pd.to_numeric(df['ID'], errors='coerce') == st.session_state.edit_target_id]
+            if not emp_subset.empty:
+                ed = emp_subset.iloc[0]
                 with st.container(border=True):
-                    ed = emp.iloc[0]
-                    st.subheader(f"Modify: {ed['Name']}")
-                    m_name = st.text_input("Full Name", ed['Name'])
-                    m_sal = st.number_input("Monthly Base Salary", value=float(ed['Base Salary']))
-                    m_role = st.selectbox("Assign Role", roles_list, index=roles_list.index(ed['Role']) if ed['Role'] in roles_list else 0)
-                    if st.button("Apply Changes"):
-                        df.loc[pd.to_numeric(df['ID'], errors='coerce') == st.session_state.edit_id, ['Name', 'Base Salary', 'Role']] = [m_name, m_sal, m_role]
-                        save_data(df, EMPLOYEE_FILE); st.session_state.edit_id = None; st.rerun()
+                    e_c1, e_c2 = st.columns(2)
+                    up_name = e_c1.text_input("Full Name", value=ed['Name'])
+                    up_role = e_c2.selectbox("Designation", roles_list, index=roles_list.index(ed['Role']) if ed['Role'] in roles_list else 0)
+                    
+                    e_c3, e_c4, e_c5 = st.columns(3)
+                    up_sal = e_c3.number_input("Base Salary", value=float(ed['Base Salary']))
+                    up_curr = e_c4.selectbox("Currency", ["PKR", "USD"], index=0 if ed['Currency'] == "PKR" else 1)
+                    up_stat = e_c5.selectbox("Status", ["Active", "Deactive"], index=0 if ed['Status'] == "Active" else 1)
+                    
+                    btn_up, btn_can, btn_spacer = st.columns([1, 1, 3])
+                    if btn_up.button("Save Changes"):
+                        df.loc[pd.to_numeric(df['ID'], errors='coerce') == st.session_state.edit_target_id, 
+                               ['Name', 'Role', 'Base Salary', 'Currency', 'Status']] = [up_name, up_role, up_sal, up_curr, up_stat]
+                        save_data(df, EMPLOYEE_FILE)
+                        st.session_state.edit_target_id = None
+                        st.success("Record updated successfully.")
+                        st.rerun()
+                    if btn_can.button("Cancel"):
+                        st.session_state.edit_target_id = None
+                        st.rerun()
 
     with tab2:
         with st.container(border=True):
-            st.subheader("New Onboarding")
-            new_name = st.text_input("Employee Full Name")
-            new_sal = st.number_input("Starting Base Salary", min_value=0.0)
-            new_role = st.selectbox("Designation", roles_list)
-            if st.button("Onboard Personnel"):
-                max_id = int(df["ID"].max() + 1) if not df.empty else 101
-                new_row = pd.DataFrame([{"ID": max_id, "Name": new_name, "Role": new_role, "Status": "Active", "Currency": "PKR", "Base Salary": new_sal, "Joining Date": datetime.now().strftime("%Y-%m-%d"), "Contact": "N/A"}])
-                save_data(pd.concat([df, new_row], ignore_index=True), EMPLOYEE_FILE); st.rerun()
+            st.markdown('<p class="config-header">New Personnel Onboarding</p>', unsafe_allow_html=True)
+            st.markdown('<p class="config-desc">Enter the details below to register a new employee. Ensure designations are updated in the Configuration tab.</p>', unsafe_allow_html=True)
+            
+            f_col1, f_col2 = st.columns(2)
+            with f_col1:
+                new_name = st.text_input("Full Name", placeholder="e.g. Hassan Ali", key="onboard_name")
+                new_role = st.selectbox("Designation", roles_list, key="onboard_role")
+            
+            with f_col2:
+                new_curr = st.selectbox("Salary Currency", ["PKR", "USD"], key="onboard_curr")
+                new_sal = st.number_input("Monthly Salary", min_value=0.0, step=1000.0, key="onboard_sal")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            btn_c1, btn_c2, btn_sp = st.columns([1.2, 1, 3])
+            
+            if btn_c1.button("Add Info", use_container_width=True):
+                if not new_name:
+                    st.error("Missing Info: Full Name is required.")
+                elif new_name in df['Name'].values:
+                    st.error(f"Duplicate Record: '{new_name}' already exists in the system.")
+                else:
+                    max_id = int(df["ID"].max() + 1) if not df.empty else 101
+                    new_entry = pd.DataFrame([{
+                        "ID": max_id, "Name": new_name, "Role": new_role, 
+                        "Status": "Active", "Currency": new_curr, "Base Salary": new_sal, 
+                        "Joining Date": datetime.now().strftime("%Y-%m-%d"), "Contact": "N/A"
+                    }])
+                    save_data(pd.concat([df, new_entry], ignore_index=True), EMPLOYEE_FILE)
+                    st.success(f"Success! {new_name} has been onboarded.")
+                    write_log(st.session_state.current_user, "Onboarding", f"Onboarded {new_name}")
+                    st.rerun()
+
+            if btn_c2.button("Reset", use_container_width=True):
+                st.rerun()
 
 # ==========================================
 # 5. PDF & PAYROLL LOGIC
@@ -308,12 +408,10 @@ def generate_pdf(data, role, jd, rules):
         pdf.line(15, 30, 195, 30)
         pdf.ln(5)
         
-        # Employee Information Bordered Table
         pdf.set_font("helvetica", "B", 10); pdf.set_fill_color(240, 240, 240)
         pdf.cell(0, 8, " EMPLOYEE INFORMATION", border=1, ln=True, fill=True)
         
         pdf.set_font("helvetica", "B", 9); pdf.set_fill_color(255, 255, 255)
-        # Row 1
         pdf.cell(40, 8, " Employee ID:", border="LTB")
         pdf.set_font("helvetica", "", 9)
         pdf.cell(50, 8, f"#{int(float(data['Employee ID']))}", border="TB")
@@ -322,7 +420,6 @@ def generate_pdf(data, role, jd, rules):
         pdf.set_font("helvetica", "", 9)
         pdf.cell(50, 8, str(data['Name']), border="TRB", ln=True)
         
-        # Row 2
         pdf.set_font("helvetica", "B", 9)
         pdf.cell(40, 8, " Joining Date:", border="LTB")
         pdf.set_font("helvetica", "", 9)
@@ -332,7 +429,6 @@ def generate_pdf(data, role, jd, rules):
         pdf.set_font("helvetica", "", 9)
         pdf.cell(50, 8, str(role), border="TRB", ln=True)
         
-        # Row 3
         pdf.set_font("helvetica", "B", 9)
         pdf.cell(40, 8, " Monthly Base:", border="LTB")
         pdf.set_font("helvetica", "", 9)
@@ -349,7 +445,7 @@ def generate_pdf(data, role, jd, rules):
         pdf.cell(50, 8, f" AMOUNT ({str(data['Currency'])})", border=1, fill=True, align="R"); pdf.ln()
         
         pdf.set_font("helvetica", "", 9)
-        pdf.cell(130, 8, " Monthly Base Salary", border="LRB")
+        pdf.cell(130, 8, " Monthly Standard Salary", border="LRB")
         pdf.cell(50, 8, f"{float(data['Base Salary']):,.2f}", border="RB", align="R"); pdf.ln()
         
         ctx = str(data['Bonus Context']) if pd.notna(data['Bonus Context']) and str(data['Bonus Context']).lower() != "nan" else "Regular"
@@ -389,8 +485,8 @@ def generate_pdf(data, role, jd, rules):
         
         pdf.set_y(260)
         pdf.set_font("helvetica", "I", 8); pdf.set_text_color(150, 150, 150)
-        pdf.cell(0, 4, "Official Payment Proof - Generated Automatically.", ln=True, align="C")
-        pdf.cell(0, 4, "Strictly Confidential - The Software District HRMS.", ln=True, align="C")
+        pdf.cell(0, 4, "Official Proof of Payment - Generated by SD HRMS.", ln=True, align="C")
+        pdf.cell(0, 4, "Strictly Confidential Document.", ln=True, align="C")
         
         return bytes(pdf.output())
     except Exception as e:
@@ -428,7 +524,7 @@ def show_payroll_management(emp_df):
                 st.session_state[f"el_{eid_key}"] = int(len(emp_logs[emp_logs['Status'] == "Extra Late"]))
                 st.session_state[f"hd_{eid_key}"] = int(len(emp_logs[emp_logs['Status'] == "Half Day"]))
                 st.session_state[f"ab_{eid_key}"] = int(len(emp_logs[emp_logs['Status'] == "Absent"]))
-            st.toast(f"Attendance Synced for {period}"); st.rerun()
+            st.toast(f"Sync Complete for {period}"); st.rerun()
 
     payroll_buffer = []
     with st.container(border=True):
@@ -460,7 +556,7 @@ def show_payroll_management(emp_df):
             payroll_buffer.append({"Month": period, "Employee ID": row['ID'], "Name": row['Name'], "Base Salary": row['Base Salary'], "Currency": row['Currency'], "Lates": l, "Extra Lates": el, "Half Days": hd, "Absents": ab, "Deductions": deduct, "Bonus": bonus, "Bonus Context": ctx, "Net Paid": net})
             st.divider()
 
-    if st.button("🚀 Process & Generate Payroll", type="primary", use_container_width=True):
+    if st.button("🚀 Confirm and Process Monthly Payroll", type="primary", use_container_width=True):
         if not payroll_history.empty:
             payroll_history['Employee ID'] = pd.to_numeric(payroll_history['Employee ID'], errors='coerce')
             payroll_history = payroll_history[~((payroll_history['Month'] == period) & (payroll_history['Employee ID'].isin([float(p['Employee ID']) for p in payroll_buffer])))]
@@ -472,11 +568,11 @@ def show_payroll_management(emp_df):
 # ==========================================
 def show_config():
     st.header("⚙️ Enterprise Configuration")
-    t1, t2 = st.tabs(["📋 Designation Registry", "⚖️ Deduction Policy"])
+    t1, t2 = st.tabs(["📋 Designation Management", "⚖️ Deduction Policy"])
     
     with t1:
         st.markdown('<p class="config-header">Job Title Registry</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Define professional roles within Software District. These designations appear as selection options during onboarding.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-desc">Define professional roles. These designations appear as selection options during onboarding.</p>', unsafe_allow_html=True)
         roles_df = load_data(CONFIG_FILE)
         c1, c2 = st.columns([4, 1.2])
         new_r = c1.text_input("New Designation Title", placeholder="Enter job title...", label_visibility="collapsed")
@@ -484,15 +580,18 @@ def show_config():
             if new_r: save_data(pd.concat([roles_df, pd.DataFrame({"Roles": [new_r]})], ignore_index=True), CONFIG_FILE); st.rerun()
         st.markdown("<br>", unsafe_allow_html=True)
         upd_roles = st.data_editor(roles_df, use_container_width=True, num_rows="dynamic", key="role_ed")
-        if st.button("Save Registry"): save_data(upd_roles, CONFIG_FILE); st.rerun()
+        if st.button("Save Official Registry"): save_data(upd_roles, CONFIG_FILE); st.rerun()
 
     with t2:
-        st.markdown('<p class="config-header">Deduction Rate Policy</p>', unsafe_allow_html=True)
-        st.markdown('<p class="config-desc">Impact of attendance exceptions. Penalties are % of daily wage (Monthly Base / 30).</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-header">Attendance Deduction Rules</p>', unsafe_allow_html=True)
+        st.markdown('<p class="config-desc">Set the financial impact of exceptions. Penalties are % of daily wage.</p>', unsafe_allow_html=True)
         att_df = load_data(ATTENDANCE_CONFIG_FILE)
-        upd = st.data_editor(att_df, use_container_width=True, column_config={"Parameter": st.column_config.TextColumn("Category", disabled=True), "Value": st.column_config.NumberColumn("% of Deduction", format="%d%%")}, key="policy_ed")
-        if st.button("Apply Updates"): save_data(upd, ATTENDANCE_CONFIG_FILE); st.rerun()
+        upd = st.data_editor(att_df, use_container_width=True, column_config={"Parameter": st.column_config.TextColumn("Exception Category", disabled=True), "Value": st.column_config.NumberColumn("% of Deduction", format="%d%%")}, key="policy_ed")
+        if st.button("Apply Global Updates"): save_data(upd, ATTENDANCE_CONFIG_FILE); st.rerun()
 
+# ==========================================
+# 7. MAIN ROUTING
+# ==========================================
 def main():
     init_storage()
     if "authenticated" not in st.session_state: st.session_state.authenticated = False
@@ -500,15 +599,15 @@ def main():
     else:
         with st.sidebar:
             st.title("SD - HRMS"); st.markdown(f"**Admin:** {st.session_state.current_user}"); st.divider()
-            page = st.radio("Navigation", ["Dashboard", "Workforce Directory", "Daily Attendance", "Payroll Management", "Configuration", "System Logs"])
+            page = st.radio("Navigation", ["Dashboard", "Employee Directory", "Daily Attendance", "Payroll Management", "Configuration", "Audit Logs"])
             if st.button("Sign Out Session", use_container_width=True): st.session_state.authenticated = False; st.rerun()
         emp_df = load_data(EMPLOYEE_FILE)
         if page == "Dashboard": show_dashboard(emp_df)
-        elif page == "Workforce Directory": show_employee_management(emp_df)
+        elif page == "Employee Directory": show_employee_management(emp_df)
         elif page == "Daily Attendance": show_daily_attendance(emp_df)
         elif page == "Payroll Management": show_payroll_management(emp_df)
         elif page == "Configuration": show_config()
-        elif page == "System Logs":
+        elif page == "Audit Logs":
             st.title("📜 Audit Trail"); logs = load_data(LOG_FILE)
             if not logs.empty: st.dataframe(logs.iloc[::-1], use_container_width=True)
 
